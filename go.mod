@@ -1,4 +1,4 @@
-module github.com/astroparam/wormhole
+module github.com/astroparam/eros
 
 go 1.15
 
