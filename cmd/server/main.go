@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/astroparam/wormhole/internal/server"
+	"github.com/astroparam/eros/internal/server"
 )
 
 func main() {
