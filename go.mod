@@ -1,4 +1,4 @@
-module github.com/astroparam/eros
+module github.com/astroparam/ceres
 
 go 1.15
 
