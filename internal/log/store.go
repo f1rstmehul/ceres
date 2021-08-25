@@ -12,9 +12,11 @@ var (
 )
 
 const (
-	lenWidth = 8 // number of bytes used to store the record's lenght
+	lenWidth = 8 // number of bytes used to store the record's length
 )
 
+// The store struct is a simple wrapper around a file with two APIs to
+// append and read bytes to and from the file.
 type store struct {
 	*os.File
 	mu   sync.Mutex
@@ -22,6 +24,7 @@ type store struct {
 	size uint64
 }
 
+// newStore creates a store for the given file.
 func newStore(f *os.File) (*store, error) {
 	fi, err := os.Stat(f.Name())
 	if err != nil {
@@ -35,6 +38,9 @@ func newStore(f *os.File) (*store, error) {
 	}, nil
 }
 
+// Append([]byte) return the number of bytes written to the store.
+// and the position where the store holds the record in its file.
+// The segment uses this position to creates an associated index entry for this record.
 func (s *store) Append(p []byte) (n uint64, pos uint64, err error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -52,6 +58,7 @@ func (s *store) Append(p []byte) (n uint64, pos uint64, err error) {
 	return uint64(w), pos, nil
 }
 
+// Read returns the record stored at the given position.
 func (s *store) Read(pos uint64) ([]byte, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -69,6 +76,9 @@ func (s *store) Read(pos uint64) ([]byte, error) {
 	return p, nil
 }
 
+// ReadAt reads len(p) bytes into p beginning at the off
+// offset in the store’s file.
+// It implements io.ReaderAt on the store type.
 func (s *store) ReadAt(p []byte, off int64) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -78,6 +88,7 @@ func (s *store) ReadAt(p []byte, off int64) (int, error) {
 	return s.File.ReadAt(p, off)
 }
 
+// Close persists any buffered data before closing the file.
 func (s *store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
